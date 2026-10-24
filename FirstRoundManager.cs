@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class FirstRoundManager : MonoBehaviour
 {
-    public Button button;
+    /*public Button button;
     public Button earlyButton;
     public GameObject gameFinishPanel;
     public GameObject reactionPanel;
@@ -20,10 +21,14 @@ public class FirstRoundManager : MonoBehaviour
     private float startReactionTime;
     private int roundCount = 0;
     private float averageReactionTime;
-    List<float> reactions = new List<float>();
+    List<float> reactions = new List<float>();*/
+    [SerializeField] private GameObject tutorialPanel;
+    [SerializeField] private GameObject gamePanel;
+
     
     private void Start()
-    {   
+    {
+        /*   
         button.gameObject.SetActive(false);
         earlyButton.gameObject.SetActive(true);
         randomTimer = Random.Range(2,11);
@@ -32,9 +37,19 @@ public class FirstRoundManager : MonoBehaviour
 
         //ColorUtility.TryParseHtmlString: AI megoldas
         ColorUtility.TryParseHtmlString("#FF0000", out colors[0]); 
-        ColorUtility.TryParseHtmlString("#22D800", out colors[1]);
+        ColorUtility.TryParseHtmlString("#22D800", out colors[1]);*/
+
+        bool showTutorial = PlayerPrefs.GetInt("ShowTutorial", 1) == 1;
+
+        tutorialPanel.SetActive(showTutorial);
+        gamePanel.SetActive(!showTutorial);
     }
 
+    public void ExitGame ()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+/*
     private void Update()
     {
         timer += Time.deltaTime;
@@ -89,5 +104,5 @@ public class FirstRoundManager : MonoBehaviour
         averageReactionTime = reactions.Average();
         Debug.Log("Average Reaction Time: " + averageReactionTime);
         averageReactionText.text = (int)averageReactionTime + "ms";
-    }
+    }*/
 }

@@ -9,6 +9,18 @@ public class MainMenu : MonoBehaviour
     public AudioSource menuMusic;
     [SerializeField] private Toggle tutorialToggle;
 
+    public void Start()
+    {
+        if (PlayerPrefs.GetInt("ShowTutorial", 1) == 1)
+        {
+            tutorialToggle.isOn = true;
+        }
+        else
+        {
+            tutorialToggle.isOn = false;
+        }
+    }
+
     private void Awake()
     {
         if (!menuMusic.isPlaying)

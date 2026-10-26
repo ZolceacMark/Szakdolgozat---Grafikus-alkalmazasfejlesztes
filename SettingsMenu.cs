@@ -13,6 +13,7 @@ public class SettingsMenu : MonoBehaviour
     List<Resolution> filteredResolutions = new List<Resolution>();
     float currentRefreshRate;
     int currentResolutionIndex = 0;
+    [SerializeField] private UnityEngine.UI.Toggle fullScreen;
 
     void Start()
     {
@@ -21,6 +22,15 @@ public class SettingsMenu : MonoBehaviour
         resolutionDropdown.ClearOptions();
 
         currentRefreshRate = (float)Screen.currentResolution.refreshRateRatio.value;
+
+        if (PlayerPrefs.GetInt("FullScreen", 1) == 1)
+        {
+            fullScreen.isOn = true;
+        }
+        else
+        {
+            fullScreen.isOn = false;
+        }
         
         List<string> options = new List<string>();
 
@@ -52,7 +62,7 @@ public class SettingsMenu : MonoBehaviour
     public void SetResolution (int resolutionIndex)
     {
         Resolution resolution = filteredResolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, true);
+        Screen.SetResolution(resolution.width, resolution.height, PlayerPrefs.GetInt("FullScreen", 0) == 1);
     }
 
     public void SetVolume (float mainVolume)

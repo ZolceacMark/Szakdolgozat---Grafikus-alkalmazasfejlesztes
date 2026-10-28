@@ -29,8 +29,48 @@ public class MainMenu : MonoBehaviour
         } 
     }
 
-    public void ReflexGame ()
+    public void ReflexGame25 ()
     {
+        PlayerPrefs.SetInt("CourseLength", 25);
+        if (tutorialToggle.isOn) {
+            PlayerPrefs.SetInt("ShowTutorial", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("ShowTutorial", 0);    
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void ReflexGame50 ()
+    {
+        PlayerPrefs.SetInt("CourseLength", 50);
+        if (tutorialToggle.isOn) {
+            PlayerPrefs.SetInt("ShowTutorial", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("ShowTutorial", 0);    
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void ReflexGame75 ()
+    {
+        PlayerPrefs.SetInt("CourseLength", 75);
+        if (tutorialToggle.isOn) {
+            PlayerPrefs.SetInt("ShowTutorial", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("ShowTutorial", 0);    
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void ReflexGame100 ()
+    {
+        PlayerPrefs.SetInt("CourseLength", 100);
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
         }

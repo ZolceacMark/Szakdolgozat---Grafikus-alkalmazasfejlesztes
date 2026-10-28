@@ -1,108 +1,205 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using System.Collections;
 
 public class FirstRoundManager : MonoBehaviour
 {
-    /*public Button button;
-    public Button earlyButton;
-    public GameObject gameFinishPanel;
-    public GameObject reactionPanel;
-    public GameObject gamePanel;
-    public TextMeshProUGUI reactionText;
-    public TextMeshProUGUI averageReactionText;
-    private bool activeButton;
-    private Color[] colors;
-    private float randomTimer;
-    private float timer;
-    private float startReactionTime;
-    private int roundCount = 0;
-    private float averageReactionTime;
-    List<float> reactions = new List<float>();*/
+    [SerializeField] private ReflexRandomImage randomImageSpawner;
+
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private GameObject gamePanel;
+    [SerializeField] private GameObject endPanel;
 
+    [SerializeField] private GameObject greenColor;
+    [SerializeField] private GameObject yellowColor;
+    [SerializeField] private GameObject whiteColor;
+    [SerializeField] private GameObject earlyButton;
+
+    [SerializeField] private TMP_Text lengthText;
+    [SerializeField] private Image[] livesImage;
+
+    private bool gameStarted;
+    private int length;
+    private float minSpawnDelay = 2f;
+    private float maxSpawnDelay = 5f;
+    private float reactionTimeLimit = 10f;
+    private bool timeOut;
+    private Coroutine reactionCoroutine;
+    private Coroutine whiteCoroutine;
+    private int lives = 3;
+
+    private void Update()
+    {
+
+        if (!gameStarted) return;
+
+        if (Mouse.current.leftButton.wasPressedThisFrame && greenColor.gameObject.activeSelf)
+        {
+            Dispawn();
+            CorrectClick();
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame && yellowColor.gameObject.activeSelf)
+        {
+            Dispawn();
+            CorrectClick();
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame && earlyButton.gameObject.activeSelf)
+            LoseLife();
+
+        if ((Mouse.current.rightButton.wasPressedThisFrame && 
+             greenColor.gameObject.activeSelf) ||
+            (Mouse.current.leftButton.wasPressedThisFrame &&
+             yellowColor.gameObject.activeSelf))
+        {
+            Dispawn();
+            DecreaseLength();
+            LoseLife();
+        }
+
+        if ((Mouse.current.leftButton.wasPressedThisFrame ||
+             Mouse.current.rightButton.wasPressedThisFrame) &&
+             whiteColor.gameObject.activeSelf)
+        {
+            Dispawn();
+            DecreaseLength();
+            LoseLife();
+        }
+
+    }
     
     private void Start()
     {
-        /*   
-        button.gameObject.SetActive(false);
-        earlyButton.gameObject.SetActive(true);
-        randomTimer = Random.Range(2,11);
-        Debug.Log("Randomized timer: " + randomTimer);
-        colors = new Color[2];
-
-        //ColorUtility.TryParseHtmlString: AI megoldas
-        ColorUtility.TryParseHtmlString("#FF0000", out colors[0]); 
-        ColorUtility.TryParseHtmlString("#22D800", out colors[1]);*/
 
         bool showTutorial = PlayerPrefs.GetInt("ShowTutorial", 1) == 1;
 
+        length = PlayerPrefs.GetInt("CourseLength", 25);
+        lengthText.text = length.ToString();
+
         tutorialPanel.SetActive(showTutorial);
         gamePanel.SetActive(!showTutorial);
+
+    }
+
+    public void StartGame()
+    {
+        StartCoroutine(Spawner());
+        gameStarted = true;
+    }
+
+    public void CorrectClick()
+    {
+        DecreaseLength();
+        Dispawn();
+        //pontszam noveles
+    }
+
+    private IEnumerator Spawner()
+    {
+        while (length > 0 && lives > 0)
+        {   
+            float randomFloat = Random.Range(minSpawnDelay, maxSpawnDelay);
+            Debug.Log("Hatralevo masodperc: " + randomFloat);
+            yield return new WaitForSeconds(randomFloat);
+
+            randomImageSpawner.ShowRandomImage();
+            earlyButton.gameObject.SetActive(false);  
+
+            if (whiteColor.gameObject.activeSelf)
+            {
+                whiteCoroutine = StartCoroutine(WhiteReaction());
+            }
+
+            timeOut = true;
+            reactionCoroutine = StartCoroutine(ReactionTimeout());
+
+            Debug.Log("Waiting for player"); 
+            yield return new WaitUntil(() => !timeOut);
+        }
+    }
+
+    private IEnumerator ReactionTimeout()
+    {
+        yield return new WaitForSeconds(reactionTimeLimit);
+
+        if (timeOut)
+        {
+            Debug.Log("Timeout");
+            timeOut = false;
+            Dispawn();
+            DecreaseLength();
+            LoseLife();   
+        }            
+    }
+
+    private IEnumerator WhiteReaction()
+    {
+        Debug.Log("5s varakozas!");
+        yield return new WaitForSeconds(2f);
+        CorrectClick();
+    }
+
+    public void Dispawn()
+    {
+        if (reactionCoroutine != null)
+        {
+            StopCoroutine(reactionCoroutine);
+            reactionCoroutine = null;
+        }
+
+        if (whiteCoroutine != null)
+        {
+            StopCoroutine(whiteCoroutine);
+            whiteCoroutine = null;
+        }
+
+        timeOut = false;
+
+        greenColor.gameObject.SetActive(false);
+        yellowColor.gameObject.SetActive(false);
+        whiteColor.gameObject.SetActive(false); 
+
+        earlyButton.gameObject.SetActive(true);     
+    }
+
+    public void DecreaseLength()
+    {
+        if (length > 0)
+        {
+            length--;
+            lengthText.text = length.ToString();
+        }
+
+        if (length == 0)
+            EndGame();   
+    }
+
+    public void LoseLife()
+    {
+        if (lives > 0)
+        {
+            lives--;
+            livesImage[lives].enabled = false;
+            if (lives == 0)
+            {
+                EndGame();
+            }
+        }    
+    }
+
+    private void EndGame()
+    {
+        Time.timeScale = 0f;
+        gamePanel.SetActive(false);
+        endPanel.SetActive(true);    
     }
 
     public void ExitGame ()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
-/*
-    private void Update()
-    {
-        timer += Time.deltaTime;
-        if (!activeButton && timer >= randomTimer)
-        {
-            SetButtonActive();
-            activeButton = true;
-            earlyButton.gameObject.SetActive(false);
-        }
 
-    }
-
-    void SetButtonActive()
-    {
-        button.gameObject.SetActive(true);
-        
-        Color randomColor = colors[1];
-        button.GetComponent<Image>().color = randomColor;
-        startReactionTime = Time.time;
-    }
-
-    public void ReactionTime()
-    {
-        float reactionTime = (Time.time - startReactionTime) * 1000f;
-        reactionText.text = (int)reactionTime + "ms";
-        reactions.Add((int)reactionTime);
-        Debug.Log("Reaction time: " + reactionTime + "ms");
-        roundCount += 1;
-        Debug.Log("Current Round: " + roundCount);
-    }
-
-    public void RestartRound()
-    {
-        randomTimer = Random.Range(2,11);
-        Debug.Log("Randomized timer: " + randomTimer);
-        timer = 0f;
-        startReactionTime = 0f;
-        earlyButton.gameObject.SetActive(true);
-        button.gameObject.SetActive(false);
-        activeButton = false;
-        if (roundCount == 5)
-        {
-            EndScreen();
-        }   
-    }
-
-    public void EndScreen()
-    {
-        reactionPanel.gameObject.SetActive(false);
-        gameFinishPanel.gameObject.SetActive(true);
-        gamePanel.gameObject.SetActive(false);
-        averageReactionTime = reactions.Average();
-        Debug.Log("Average Reaction Time: " + averageReactionTime);
-        averageReactionText.text = (int)averageReactionTime + "ms";
-    }*/
 }

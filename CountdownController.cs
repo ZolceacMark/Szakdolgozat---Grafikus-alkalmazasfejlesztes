@@ -6,6 +6,8 @@ using TMPro;
 public class CountdownController : MonoBehaviour
 {
 
+    [SerializeField] private FirstRoundManager gameStarter;
+
     [SerializeField] private int countdownTime = 3;
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private GameObject earlyButton;
@@ -15,12 +17,16 @@ public class CountdownController : MonoBehaviour
     {
         if (PlayerPrefs.GetInt("ShowTutorial", 0) == 0)
         {
-            StartCoroutine(CountdownToStart());
+            StartCountdown();
         }
     }
 
     private void StartCountdown()
-    {
+    {   
+        StopAllCoroutines();
+
+        countdownTime = 3;
+        countdownText.gameObject.SetActive(true);
         earlyButton.SetActive(false);
         StartCoroutine(CountdownToStart());
     }
@@ -56,6 +62,7 @@ public class CountdownController : MonoBehaviour
         ColorUtility.TryParseHtmlString("#22D800", out color);
         countdownText.color = color;
         earlyButton.SetActive(true);
+        gameStarter.StartGame();
 
         yield return new WaitForSeconds(1f);
 

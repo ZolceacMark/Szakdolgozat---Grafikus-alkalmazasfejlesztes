@@ -10,6 +10,7 @@ public class PauseManager : MonoBehaviour
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject backButton;
     [SerializeField] private GameObject inGameBackButton;
+    [SerializeField] private GameObject inGameRestartButton;
     [SerializeField] private GameObject exitButton;
 
 
@@ -46,6 +47,7 @@ public class PauseManager : MonoBehaviour
         optionsPanel.SetActive(true);
         backButton.SetActive(false);
         inGameBackButton.SetActive(true);
+        inGameRestartButton.SetActive(true);
         exitButton.SetActive(true);
     }
 

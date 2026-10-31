@@ -34,10 +34,12 @@ public class MainMenu : MonoBehaviour
         PlayerPrefs.SetInt("CourseLength", 25);
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
-            PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("ShowTutorial", 0); 
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0);   
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -47,10 +49,12 @@ public class MainMenu : MonoBehaviour
         PlayerPrefs.SetInt("CourseLength", 50);
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
-            PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("ShowTutorial", 0);  
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0);  
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -60,10 +64,12 @@ public class MainMenu : MonoBehaviour
         PlayerPrefs.SetInt("CourseLength", 75);
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
-            PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("ShowTutorial", 0);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0);    
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -73,10 +79,12 @@ public class MainMenu : MonoBehaviour
         PlayerPrefs.SetInt("CourseLength", 100);
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
-            PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("ShowTutorial", 0);   
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0); 
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
@@ -85,10 +93,12 @@ public class MainMenu : MonoBehaviour
     {
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
-            PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("ShowTutorial", 0);   
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0); 
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
     }
@@ -97,10 +107,12 @@ public class MainMenu : MonoBehaviour
     {
         if (tutorialToggle.isOn) {
             PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
         }
         else
         {
             PlayerPrefs.SetInt("ShowTutorial", 0);    
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0);
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
     }

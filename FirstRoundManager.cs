@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 
 public class FirstRoundManager : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class FirstRoundManager : MonoBehaviour
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private GameObject pauseBackgroundPanel;
+    [SerializeField] private GameObject completedScreen;
+    [SerializeField] private GameObject failedScreen;
 
     [SerializeField] private GameObject greenColor;
     [SerializeField] private GameObject yellowColor;
@@ -20,30 +24,43 @@ public class FirstRoundManager : MonoBehaviour
     [SerializeField] private GameObject earlyButton;
 
     [SerializeField] private TMP_Text lengthText;
+    [SerializeField] private TMP_Text avgReactionText;
     [SerializeField] private Image[] livesImage;
 
     private bool gameStarted;
+    private bool gameEnded;
     private int length;
-    private float minSpawnDelay = 2f;
-    private float maxSpawnDelay = 5f;
+    private float minSpawnDelay = 1f;
+    private float maxSpawnDelay = 2f;
     private float reactionTimeLimit = 10f;
     private bool timeOut;
     private Coroutine reactionCoroutine;
     private Coroutine whiteCoroutine;
     private int lives = 3;
 
+    private int selectedLength;
+    private List<float> greenReactions = new List<float>();
+    private List<float> yellowReactions = new List<float>();
+    private int correctWhiteReactions;
+    private int wrongWhiteReactions;
+    private float reactionTimer;  
+    private bool failedGame;
+
     private void Update()
     {
-
         if (!gameStarted) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame && greenColor.gameObject.activeSelf)
         {
+            greenReactions.Add((Time.time - reactionTimer) * 1000f);
+            Debug.Log($"Green reaction time: {greenReactions[^1]:F0} ms");
             Dispawn();
             CorrectClick();
         }
         else if (Mouse.current.rightButton.wasPressedThisFrame && yellowColor.gameObject.activeSelf)
         {
+            yellowReactions.Add((Time.time - reactionTimer) * 1000f);
+            Debug.Log($"Yellow reaction time: {yellowReactions[^1]:F0} ms");
             Dispawn();
             CorrectClick();
         }
@@ -56,17 +73,19 @@ public class FirstRoundManager : MonoBehaviour
              yellowColor.gameObject.activeSelf))
         {
             Dispawn();
+            LoseLife(); 
             DecreaseLength();
-            LoseLife();
         }
 
         if ((Mouse.current.leftButton.wasPressedThisFrame ||
              Mouse.current.rightButton.wasPressedThisFrame) &&
              whiteColor.gameObject.activeSelf)
         {
+            wrongWhiteReactions++;
+
             Dispawn();
+            LoseLife(); 
             DecreaseLength();
-            LoseLife();
         }
 
     }
@@ -77,6 +96,7 @@ public class FirstRoundManager : MonoBehaviour
         bool showTutorial = PlayerPrefs.GetInt("ShowTutorial", 1) == 1;
 
         length = PlayerPrefs.GetInt("CourseLength", 25);
+        selectedLength = length;
         lengthText.text = length.ToString();
 
         tutorialPanel.SetActive(showTutorial);
@@ -94,7 +114,6 @@ public class FirstRoundManager : MonoBehaviour
     {
         DecreaseLength();
         Dispawn();
-        //pontszam noveles
     }
 
     private IEnumerator Spawner()
@@ -106,6 +125,7 @@ public class FirstRoundManager : MonoBehaviour
             yield return new WaitForSeconds(randomFloat);
 
             randomImageSpawner.ShowRandomImage();
+            reactionTimer = Time.time;
             earlyButton.gameObject.SetActive(false);  
 
             if (whiteColor.gameObject.activeSelf)
@@ -130,15 +150,16 @@ public class FirstRoundManager : MonoBehaviour
             Debug.Log("Timeout");
             timeOut = false;
             Dispawn();
-            DecreaseLength();
-            LoseLife();   
+            LoseLife(); 
+            DecreaseLength();   
         }            
     }
 
     private IEnumerator WhiteReaction()
     {
-        Debug.Log("5s varakozas!");
-        yield return new WaitForSeconds(2f);
+        Debug.Log("1.5s varakozas");
+        yield return new WaitForSeconds(1.5f);
+        correctWhiteReactions++;
         CorrectClick();
     }
 
@@ -185,21 +206,135 @@ public class FirstRoundManager : MonoBehaviour
             livesImage[lives].enabled = false;
             if (lives == 0)
             {
+                failedGame = true;
                 EndGame();
             }
         }    
     }
 
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        PlayerPrefs.SetInt("ShowTutorial", 0);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
+    }
+
+    private void AvgReaction()
+    {
+        float a, b, c;
+        a = greenReactions.Sum();
+        b = yellowReactions.Sum();
+        c = greenReactions.Count + yellowReactions.Count;
+
+        if (c > 0)
+        {
+            avgReactionText.text = $"{((a+b) / c):F0} ms";
+        }
+        else
+            avgReactionText.text = "-";
+
+    }
+
     private void EndGame()
     {
+        if (gameEnded)
+            return;
+
+        gameEnded = true;
+        SaveReactions();
+        SaveWhiteReactions();
+        SavePlayedGames();
+
         Time.timeScale = 0f;
         gamePanel.SetActive(false);
-        endPanel.SetActive(true);    
+        endPanel.SetActive(true);  
+        pauseBackgroundPanel.SetActive(true);
+        failedScreen.SetActive(failedGame);
+        completedScreen.SetActive(!failedGame);  
+        AvgReaction();
     }
 
     public void ExitGame ()
-    {
+    {   
+        PlayerPrefs.SetInt("ShowTutorial",  PlayerPrefs.GetInt("OriginalShowTutorial", 0));
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    private List<float> LoadReactions(string key)
+    {
+        string json = PlayerPrefs.GetString(key, "{\"values\": []}");
+
+        return JsonUtility.FromJson<ReactionData>(json).values;
+    }
+
+    private void SaveReactions()
+    {
+        List<float> savedGreenReactions = LoadReactions("ReflexGreenReactions"); 
+        List<float> savedYellowReactions = LoadReactions("ReflexYellowReactions");
+
+        savedGreenReactions.AddRange(greenReactions);
+        savedYellowReactions.AddRange(yellowReactions);
+
+        string greenJson = JsonUtility.ToJson(new ReactionData {values = savedGreenReactions});
+        string yellowJson = JsonUtility.ToJson(new ReactionData {values = savedYellowReactions});
+
+        PlayerPrefs.SetString("ReflexGreenReactions", greenJson);
+        PlayerPrefs.SetString("ReflexYellowReactions", yellowJson);
+
+        PlayerPrefs.Save(); 
+    }
+
+    private void SaveWhiteReactions()
+    {
+        int savedCorrect = PlayerPrefs.GetInt("ReflexCorrectWhite", 0);
+        int savedWrong = PlayerPrefs.GetInt("ReflexWrongWhite", 0);
+
+        correctWhiteReactions += savedCorrect;
+        wrongWhiteReactions += savedWrong;
+
+        PlayerPrefs.SetInt("ReflexCorrectWhite", correctWhiteReactions);
+        PlayerPrefs.SetInt("ReflexWrongWhite", wrongWhiteReactions);
+
+        PlayerPrefs.Save();
+    }
+
+    private void SavePlayedGames()
+    {
+        int totalGames = PlayerPrefs.GetInt("ReflexPlayedGames", 0);
+        totalGames++;
+        PlayerPrefs.SetInt("ReflexPlayedGames", totalGames);
+        Debug.Log("Total played games: " + totalGames);
+
+        string lengthKey = "Reflex" + selectedLength;
+        int playedLength = PlayerPrefs.GetInt(lengthKey + "Played", 0);
+        playedLength++;
+        PlayerPrefs.SetInt(lengthKey + "Played", playedLength);
+        Debug.Log("Total played games in this mode: " + playedLength);
+
+        if (failedGame)
+        {
+            int totalFailed = PlayerPrefs.GetInt("ReflexFailedGames", 0);
+            totalFailed++;
+            PlayerPrefs.SetInt("ReflexFailedGames", totalFailed);
+
+            int failedLength = PlayerPrefs.GetInt(lengthKey + "Failed", 0);
+            failedLength++;
+            PlayerPrefs.SetInt(lengthKey + "Failed", failedLength);
+            Debug.Log("Total failed games: " + failedLength);
+        }
+        else
+        {
+            int totalCompleted = PlayerPrefs.GetInt("ReflexCompletedGames", 0);
+            totalCompleted++;
+            PlayerPrefs.SetInt("ReflexCompletedGames", totalCompleted);
+
+            int completedLength = PlayerPrefs.GetInt(lengthKey + "Completed", 0);
+            completedLength++;
+            PlayerPrefs.SetInt(lengthKey + "Completed", completedLength);
+            Debug.Log("Total completed games: " + completedLength);
+        }
+
+        PlayerPrefs.Save();
     }
 
 }

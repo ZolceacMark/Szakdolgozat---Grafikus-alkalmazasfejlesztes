@@ -1,25 +1,27 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using TMPro;
-using System.Linq;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 public class MemoryManagerEasy : MonoBehaviour
 {
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private GameObject pauseBG;
     [SerializeField] private GameObject[] colorButtons;
     [SerializeField] private GameObject[] colorGlows;
+    [SerializeField] private GameObject newRecordText;
     [SerializeField] private Image[] livesImage;
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text finalScoreText;
 
     private List<int> colors = new List<int>();
 
-    private int score;
+    private bool gameStarted;
+    private int score = 0;
     private bool enableInput;
     private int lives = 3;
     private int currentInputIndex;
@@ -30,18 +32,29 @@ public class MemoryManagerEasy : MonoBehaviour
     
         tutorialPanel.SetActive(showTutorial);
         gamePanel.SetActive(!showTutorial);
+
+        scoreText.text = "Score: " + score.ToString();
     }
 
     public void StartGame()
-    {   
+    {   if (gameStarted)
+            return;
+
+        gameStarted = true;
         RandomColor();
-        StartCoroutine(FlashColor());
+        StartCoroutine(InitialFlashColor());
     }
 
     private void RandomColor()
     {
         int randomColor = Random.Range(0, colorButtons.Length);
         colors.Add(randomColor);
+    }
+
+    private IEnumerator InitialFlashColor()
+    {
+        yield return new WaitForSeconds(1f);
+        StartCoroutine(FlashColor());
     }
 
     private IEnumerator FlashColor()
@@ -51,10 +64,10 @@ public class MemoryManagerEasy : MonoBehaviour
 
         foreach (int colorIndex in colors)
         {
-            colorButtons[colorIndex].SetActive(true);
+            colorGlows[colorIndex].SetActive(true);
             yield return new WaitForSeconds(0.5f);
 
-            colorButtons[colorIndex].SetActive(false);
+            colorGlows[colorIndex].SetActive(false);
             yield return new WaitForSeconds(0.3f);
         }
 
@@ -73,6 +86,8 @@ public class MemoryManagerEasy : MonoBehaviour
             if (currentInputIndex == colors.Count)
             {
                 enableInput = false;
+                score++;
+                scoreText.text = "Score: " + score.ToString();
                 StartCoroutine(NextRound());
             }
         }
@@ -115,9 +130,26 @@ public class MemoryManagerEasy : MonoBehaviour
         }    
     }    
 
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        PlayerPrefs.SetInt("ShowTutorial", 0);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
+    }    
+
     private void EndGame()
     {
-        gamePanel.SetActive(false);
+        if (score > PlayerPrefs.GetInt("MemoryEasyHighestScore", 0))
+        {
+            PlayerPrefs.SetInt("MemoryEasyHighestScore", score);
+            PlayerPrefs.Save();
+
+            newRecordText.SetActive(true);
+        }
+
+        finalScoreText.text = score.ToString();
+        Time.timeScale = 0f;
+        pauseBG.SetActive(true);
         endPanel.SetActive(true);  
     }
 

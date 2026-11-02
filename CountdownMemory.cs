@@ -2,11 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class CountdownMemory : MonoBehaviour
 {
 
-    [SerializeField] private MemoryManagerEasy gameStarter;
+    [SerializeField] private UnityEvent gameStarter;
 
     [SerializeField] private int countdownTime = 3;
     [SerializeField] private TMP_Text countdownText;
@@ -69,7 +70,7 @@ public class CountdownMemory : MonoBehaviour
         countdownText.gameObject.SetActive(false); 
         earlyButton.SetActive(true);
         showColors.SetActive(true);
-        gameStarter.StartGame();
+        gameStarter.Invoke();
     }    
 
 }

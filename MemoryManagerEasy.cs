@@ -41,6 +41,10 @@ public class MemoryManagerEasy : MonoBehaviour
             return;
 
         gameStarted = true;
+        int totalPlayed = PlayerPrefs.GetInt("MemoryEasyTotalPlayed", 0);
+        PlayerPrefs.SetInt("MemoryEasyTotalPlayed", totalPlayed + 1);
+        PlayerPrefs.Save();
+        Debug.Log("Total Played: " + PlayerPrefs.GetInt("MemoryEasyTotalPlayed", 0));
         RandomColor();
         StartCoroutine(InitialFlashColor());
     }
@@ -88,12 +92,20 @@ public class MemoryManagerEasy : MonoBehaviour
                 enableInput = false;
                 score++;
                 scoreText.text = "Score: " + score.ToString();
+                int totalCompleted = PlayerPrefs.GetInt("MemoryEasyCompletedRounds", 0);
+                PlayerPrefs.SetInt("MemoryEasyCompletedRounds", totalCompleted + 1);
+                PlayerPrefs.Save();
+                Debug.Log("Completed Rounds: " + PlayerPrefs.GetInt("MemoryEasyCompletedRounds", 0));
                 StartCoroutine(NextRound());
             }
         }
         else
         {
             enableInput = false;
+            int totalMistakes = PlayerPrefs.GetInt("MemoryEasyTotalMistakes", 0);
+            PlayerPrefs.SetInt("MemoryEasyTotalMistakes", totalMistakes + 1);
+            PlayerPrefs.Save();
+            Debug.Log("Total Mistakes: " + PlayerPrefs.GetInt("MemoryEasyTotalMistakes", 0));
             LoseLife();
             if (lives > 0)
             {

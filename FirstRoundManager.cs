@@ -26,6 +26,7 @@ public class FirstRoundManager : MonoBehaviour
     [SerializeField] private TMP_Text lengthText;
     [SerializeField] private TMP_Text avgReactionText;
     [SerializeField] private Image[] livesImage;
+    [SerializeField] private CorrectWrongSFX clickSFX;
 
     private bool gameStarted;
     private bool gameEnded;
@@ -112,6 +113,7 @@ public class FirstRoundManager : MonoBehaviour
 
     public void CorrectClick()
     {
+        clickSFX.PlayCorrectSFX();
         DecreaseLength();
         Dispawn();
     }
@@ -202,6 +204,10 @@ public class FirstRoundManager : MonoBehaviour
     {
         if (lives > 0)
         {
+            if (lives > 1)
+            {
+                clickSFX.PlayWrongSFX();
+            }
             lives--;
             livesImage[lives].enabled = false;
             if (lives == 0)
@@ -241,6 +247,7 @@ public class FirstRoundManager : MonoBehaviour
             return;
 
         gameEnded = true;
+        clickSFX.PlayGameOverSFX();
         SaveReactions();
         SaveWhiteReactions();
         SavePlayedGames();

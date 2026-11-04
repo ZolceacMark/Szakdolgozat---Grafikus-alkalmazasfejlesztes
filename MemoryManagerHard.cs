@@ -21,6 +21,8 @@ public class MemoryManagerHard : MonoBehaviour
     [SerializeField] private Image[] livesImage;
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text finalScoreText;
+    [SerializeField] private CorrectWrongSFX corretWrongSFX;
+    [SerializeField] private AudioClip flashColorSFX;
 
     private enum InputType{
         Click,
@@ -87,7 +89,6 @@ public class MemoryManagerHard : MonoBehaviour
         int totalPlayed = PlayerPrefs.GetInt("MemoryHardTotalPlayed", 0);
         PlayerPrefs.SetInt("MemoryHardTotalPlayed", totalPlayed + 1);
         PlayerPrefs.Save();
-        Debug.Log("Total Played: " + PlayerPrefs.GetInt("MemoryHardTotalPlayed", 0));
         RandomColor();
         StartCoroutine(InitialFlashColor());
     }
@@ -98,7 +99,6 @@ public class MemoryManagerHard : MonoBehaviour
         InputType randomInput = (InputType) Random.Range(0, 2);
         colors.Add(randomColor);
         inputTypes.Add(randomInput);
-        Debug.Log("Color and input: " + randomColor + " " + randomInput);
     }
 
     private IEnumerator InitialFlashColor()
@@ -117,6 +117,7 @@ public class MemoryManagerHard : MonoBehaviour
             int colorIndex = colors[i];
             InputType input = inputTypes[i];
             colorGlows[colorIndex].SetActive(true);
+            SFXManager.instance.PlaySFXClip(flashColorSFX, transform, 1f);
             if (input == InputType.Click)
             {
                 clickText.SetActive(true);
@@ -164,9 +165,8 @@ public class MemoryManagerHard : MonoBehaviour
 
         if (colorIndex == expectedColor && expectedInput == input)
         {
-            Debug.Log("Correct!");
-
             currentInputIndex++;
+            corretWrongSFX.PlayCorrectSFX();
 
             if (currentInputIndex == colors.Count)
             {
@@ -178,15 +178,12 @@ public class MemoryManagerHard : MonoBehaviour
                 int totalCompleted = PlayerPrefs.GetInt("MemoryHardCompletedRounds", 0);
                 PlayerPrefs.SetInt("MemoryHardCompletedRounds", totalCompleted + 1);
                 PlayerPrefs.Save();
-                Debug.Log("Completed rounds: " + totalCompleted + 1);
 
                 StartCoroutine(NextRound());
             }
         }
         else
         {
-            Debug.Log("Wrong");
-
             int totalMistakes = PlayerPrefs.GetInt("MemoryHardTotalMistakes", 0);
             PlayerPrefs.SetInt("MemoryHardTotalMistakes", totalMistakes + 1);
 
@@ -232,6 +229,10 @@ public class MemoryManagerHard : MonoBehaviour
     {
         if (lives > 0)
         {
+            if (lives > 1)
+            {
+                corretWrongSFX.PlayWrongSFX();
+            }
             lives--;
             livesImage[lives].enabled = false;
             if (lives == 0)
@@ -250,6 +251,7 @@ public class MemoryManagerHard : MonoBehaviour
 
     private void EndGame()
     {
+        corretWrongSFX.PlayGameOverSFX();
         if (score > PlayerPrefs.GetInt("MemoryHardHighestScore", 0))
         {
             PlayerPrefs.SetInt("MemoryHardHighestScore", score);
@@ -262,7 +264,37 @@ public class MemoryManagerHard : MonoBehaviour
         Time.timeScale = 0f;
         pauseBG.SetActive(true);
         endPanel.SetActive(true);  
-    }
+
+        Debug.Log("===== MEMORY HARD STATISTICS =====");
+
+        Debug.Log("Total Played: " +
+            PlayerPrefs.GetInt("MemoryHardTotalPlayed", 0));
+
+        Debug.Log("Completed Rounds: " +
+            PlayerPrefs.GetInt("MemoryHardCompletedRounds", 0));
+
+        Debug.Log("Total Mistakes: " +
+            PlayerPrefs.GetInt("MemoryHardTotalMistakes", 0));
+
+        Debug.Log("Button Mistakes: " +
+            PlayerPrefs.GetInt("MemoryHardButtonMistakes", 0));
+
+        Debug.Log("Click Mistakes: " +
+            PlayerPrefs.GetInt("MemoryHardClickMistakes", 0));
+
+        Debug.Log("Total Button Inputs: " +
+            PlayerPrefs.GetInt("MemoryHardTotalButton", 0));
+
+        Debug.Log("Total Click Inputs: " +
+            PlayerPrefs.GetInt("MemoryHardTotalClick", 0));
+
+        Debug.Log("Highest Score: " +
+            PlayerPrefs.GetInt("MemoryHardHighestScore", 0));
+
+        Debug.Log("Current Score: " + score);
+
+        Debug.Log("==================================");        
+            }
 
 }
 

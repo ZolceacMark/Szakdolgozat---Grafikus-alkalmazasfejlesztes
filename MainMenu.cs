@@ -103,6 +103,20 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
     }
 
+    public void MemoryGameHard ()
+    {
+        if (tutorialToggle.isOn) {
+            PlayerPrefs.SetInt("ShowTutorial", 1);
+            PlayerPrefs.SetInt("OriginalShowTutorial", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("ShowTutorial", 0);   
+            PlayerPrefs.SetInt("OriginalShowTutorial", 0); 
+        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
+    }
+
      public void StroopGame ()
     {
         if (tutorialToggle.isOn) {

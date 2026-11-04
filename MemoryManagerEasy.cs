@@ -17,6 +17,8 @@ public class MemoryManagerEasy : MonoBehaviour
     [SerializeField] private Image[] livesImage;
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text finalScoreText;
+    [SerializeField] private CorrectWrongSFX clickSFX;
+    [SerializeField] private AudioClip flashColorSFX;
 
     private List<int> colors = new List<int>();
 
@@ -69,6 +71,7 @@ public class MemoryManagerEasy : MonoBehaviour
         foreach (int colorIndex in colors)
         {
             colorGlows[colorIndex].SetActive(true);
+            SFXManager.instance.PlaySFXClip(flashColorSFX, transform, 1f);
             yield return new WaitForSeconds(0.5f);
 
             colorGlows[colorIndex].SetActive(false);
@@ -85,7 +88,8 @@ public class MemoryManagerEasy : MonoBehaviour
 
         if (colorIndex == colors[currentInputIndex])
         {
-            currentInputIndex++;
+            currentInputIndex++; 
+            clickSFX.PlayCorrectSFX();          
 
             if (currentInputIndex == colors.Count)
             {
@@ -133,6 +137,10 @@ public class MemoryManagerEasy : MonoBehaviour
     {
         if (lives > 0)
         {
+            if (lives > 1)
+            {
+                clickSFX.PlayWrongSFX();
+            }
             lives--;
             livesImage[lives].enabled = false;
             if (lives == 0)
@@ -151,6 +159,7 @@ public class MemoryManagerEasy : MonoBehaviour
 
     private void EndGame()
     {
+        clickSFX.PlayGameOverSFX();
         if (score > PlayerPrefs.GetInt("MemoryEasyHighestScore", 0))
         {
             PlayerPrefs.SetInt("MemoryEasyHighestScore", score);

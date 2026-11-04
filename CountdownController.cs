@@ -7,6 +7,7 @@ public class CountdownController : MonoBehaviour
 {
 
     [SerializeField] private FirstRoundManager gameStarter;
+    [SerializeField] private CountdownSFX countdownSFX;
 
     [SerializeField] private int countdownTime = 3;
     [SerializeField] private TMP_Text countdownText;
@@ -53,6 +54,7 @@ public class CountdownController : MonoBehaviour
             }
             
             countdownText.color = color;
+            countdownSFX.PlayCountdownSFX();
 
             yield return new WaitForSeconds(1f);
             countdownTime--;
@@ -61,6 +63,7 @@ public class CountdownController : MonoBehaviour
         countdownText.text = "Start!";
         ColorUtility.TryParseHtmlString("#22D800", out color);
         countdownText.color = color;
+        countdownSFX.PlayStartSFX();
         earlyButton.SetActive(true);
         gameStarter.StartGame();
 

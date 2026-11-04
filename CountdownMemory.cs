@@ -8,6 +8,7 @@ public class CountdownMemory : MonoBehaviour
 {
 
     [SerializeField] private UnityEvent gameStarter;
+    [SerializeField] private CountdownSFX countdownSFX;
 
     [SerializeField] private int countdownTime = 3;
     [SerializeField] private TMP_Text countdownText;
@@ -56,6 +57,7 @@ public class CountdownMemory : MonoBehaviour
             }
             
             countdownText.color = color;
+            countdownSFX.PlayCountdownSFX();
 
             yield return new WaitForSeconds(1f);
             countdownTime--;
@@ -64,6 +66,7 @@ public class CountdownMemory : MonoBehaviour
         countdownText.text = "Start!";
         ColorUtility.TryParseHtmlString("#22D800", out color);
         countdownText.color = color;
+        countdownSFX.PlayStartSFX();
 
         yield return new WaitForSeconds(0.5f);
 

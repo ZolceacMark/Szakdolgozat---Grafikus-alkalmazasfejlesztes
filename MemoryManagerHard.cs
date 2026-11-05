@@ -86,9 +86,15 @@ public class MemoryManagerHard : MonoBehaviour
             return;
 
         gameStarted = true;
+
         int totalPlayed = PlayerPrefs.GetInt("MemoryHardTotalPlayed", 0);
         PlayerPrefs.SetInt("MemoryHardTotalPlayed", totalPlayed + 1);
         PlayerPrefs.Save();
+
+        int overallPlayed = PlayerPrefs.GetInt("MemoryOverallPlayedGames", 0);
+        PlayerPrefs.SetInt("MemoryOverallPlayedGames", overallPlayed);
+        PlayerPrefs.Save();
+
         RandomColor();
         StartCoroutine(InitialFlashColor());
     }
@@ -259,7 +265,7 @@ public class MemoryManagerHard : MonoBehaviour
 
             newRecordText.SetActive(true);
         }
-
+        SaveModeScoreStats("MemoryHard");
         finalScoreText.text = score.ToString();
         Time.timeScale = 0f;
         pauseBG.SetActive(true);
@@ -276,25 +282,25 @@ public class MemoryManagerHard : MonoBehaviour
         Debug.Log("Total Mistakes: " +
             PlayerPrefs.GetInt("MemoryHardTotalMistakes", 0));
 
-        Debug.Log("Button Mistakes: " +
-            PlayerPrefs.GetInt("MemoryHardButtonMistakes", 0));
-
-        Debug.Log("Click Mistakes: " +
-            PlayerPrefs.GetInt("MemoryHardClickMistakes", 0));
-
-        Debug.Log("Total Button Inputs: " +
-            PlayerPrefs.GetInt("MemoryHardTotalButton", 0));
-
-        Debug.Log("Total Click Inputs: " +
-            PlayerPrefs.GetInt("MemoryHardTotalClick", 0));
-
         Debug.Log("Highest Score: " +
-            PlayerPrefs.GetInt("MemoryHardHighestScore", 0));
+            PlayerPrefs.GetInt("MemoryHardHighestScore", 0));    
+    }
 
-        Debug.Log("Current Score: " + score);
+    private void SaveModeScoreStats(string mode)
+    {
+        int totalScore = PlayerPrefs.GetInt(mode + "TotalScore", 0);
+        totalScore += score;
+        PlayerPrefs.SetInt(mode + "TotalScore", totalScore);
 
-        Debug.Log("==================================");        
-            }
+        int overallHighScore = PlayerPrefs.GetInt("MemoryOverallHighestScore", 0);
+
+        if (score > overallHighScore)
+        {
+            PlayerPrefs.SetInt("MemoryOverallHighestScore", score);
+        }   
+
+        PlayerPrefs.Save();
+    }
 
 }
 

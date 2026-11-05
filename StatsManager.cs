@@ -11,23 +11,15 @@ public class StatsManager : MonoBehaviour
 
     [Header("Reflex Length 25 Stats")]
     [SerializeField] TMP_Text played25Text;
-    [SerializeField] TMP_Text completed25Text;
-    [SerializeField] TMP_Text failed25Text;
 
     [Header("Reflex Length 50 Stats")]
     [SerializeField] TMP_Text played50Text;
-    [SerializeField] TMP_Text completed50Text;
-    [SerializeField] TMP_Text failed50Text;
 
     [Header("Reflex Length 75 Stats")]
     [SerializeField] TMP_Text played75Text;
-    [SerializeField] TMP_Text completed75Text;
-    [SerializeField] TMP_Text failed75Text;
 
     [Header("Reflex Length 100 Stats")]
     [SerializeField] TMP_Text played100Text;
-    [SerializeField] TMP_Text completed100Text;
-    [SerializeField] TMP_Text failed100Text;
 
     [Header("Reflex Reaction Stats")]
     [SerializeField] TMP_Text avgReactionText;
@@ -56,19 +48,17 @@ public class StatsManager : MonoBehaviour
 
      private void LoadLengthStats()
     {
-        SetLengthStats(25, played25Text, completed25Text, failed25Text);
-        SetLengthStats(50, played50Text, completed50Text, failed50Text);
-        SetLengthStats(75, played75Text, completed75Text, failed75Text);
-        SetLengthStats(100, played100Text, completed100Text, failed100Text);
+        SetLengthStats(25, played25Text);
+        SetLengthStats(50, played50Text);
+        SetLengthStats(75, played75Text);
+        SetLengthStats(100, played100Text);
     }
 
-    private void SetLengthStats(int length, TMP_Text playedText, TMP_Text completedText, TMP_Text failedText)
+    private void SetLengthStats(int length, TMP_Text playedText)
     {
         string lengthKey = "Reflex" + length;
 
         playedText.text = PlayerPrefs.GetInt(lengthKey + "Played", 0).ToString();
-        completedText.text = PlayerPrefs.GetInt(lengthKey + "Completed", 0).ToString();
-        failedText.text = PlayerPrefs.GetInt(lengthKey + "Failed", 0).ToString();
     }
 
     private void LoadReactionStats()

@@ -128,7 +128,7 @@ public class MainMenu : MonoBehaviour
             PlayerPrefs.SetInt("ShowTutorial", 0);    
             PlayerPrefs.SetInt("OriginalShowTutorial", 0);
         }
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 4);
     }
 
     public void Quit ()

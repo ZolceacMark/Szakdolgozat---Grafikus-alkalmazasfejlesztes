@@ -43,9 +43,15 @@ public class MemoryManagerEasy : MonoBehaviour
             return;
 
         gameStarted = true;
+
         int totalPlayed = PlayerPrefs.GetInt("MemoryEasyTotalPlayed", 0);
         PlayerPrefs.SetInt("MemoryEasyTotalPlayed", totalPlayed + 1);
         PlayerPrefs.Save();
+
+        int overallTotalPlayed = PlayerPrefs.GetInt("MemoryOverallPlayedGames", 0);
+        PlayerPrefs.SetInt("MemoryOverallPlayedGames", overallTotalPlayed);
+        PlayerPrefs.Save();
+
         Debug.Log("Total Played: " + PlayerPrefs.GetInt("MemoryEasyTotalPlayed", 0));
         RandomColor();
         StartCoroutine(InitialFlashColor());
@@ -167,11 +173,27 @@ public class MemoryManagerEasy : MonoBehaviour
 
             newRecordText.SetActive(true);
         }
-
+        SaveModeScoreStats("MemoryEasy");
         finalScoreText.text = score.ToString();
         Time.timeScale = 0f;
         pauseBG.SetActive(true);
         endPanel.SetActive(true);  
+    }
+
+    private void SaveModeScoreStats(string mode)
+    {
+        int totalScore = PlayerPrefs.GetInt(mode + "TotalScore", 0);
+        totalScore += score;
+        PlayerPrefs.SetInt(mode + "TotalScore", totalScore);
+
+        int overallHighScore = PlayerPrefs.GetInt("MemoryOverallHighestScore", 0);
+
+        if (score > overallHighScore)
+        {
+            PlayerPrefs.SetInt("MemoryOverallHighestScore", score);
+        }   
+
+        PlayerPrefs.Save();
     }
 
 }

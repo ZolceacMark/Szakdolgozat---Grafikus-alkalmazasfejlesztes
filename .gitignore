@@ -15,3 +15,8 @@ MemoryManagerHard.cs.meta
 CountdownSFX.cs.meta
 CorrectWrongSFX.cs.meta
 StatsManagerMemory.cs.meta
+CountdownStroop.cs.meta
+GameVideoManager.cs.meta
+StroopButtonRandomizer.cs.meta
+StroopManager.cs.meta
+StroopTimer.cs.meta

@@ -137,4 +137,10 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
+    public void DeleteStats()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
+
 }

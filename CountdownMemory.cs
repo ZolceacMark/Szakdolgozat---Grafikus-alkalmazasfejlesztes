@@ -14,6 +14,7 @@ public class CountdownMemory : MonoBehaviour
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private GameObject showColors;
     [SerializeField] private GameObject earlyButton;
+    
     private Color color;
 
     private void Start()

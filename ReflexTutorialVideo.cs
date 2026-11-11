@@ -60,7 +60,8 @@ public class ReflexTutorialVideo : MonoBehaviour
     }
 
     private void OnDisable()
-    {   if (reflexTutorial != null)
+    {   
+        if (reflexTutorial != null)
         {
             reflexTutorial.Stop();
             reflexTutorial.frame = 0;
@@ -68,7 +69,8 @@ public class ReflexTutorialVideo : MonoBehaviour
     }
 
     private void OnDestroy()
-    {   if (reflexTutorial != null)
+    {   
+        if (reflexTutorial != null)
             reflexTutorial.loopPointReached -= ShowReplayButton;
     }
 }

@@ -8,9 +8,11 @@ public class StroopManager : MonoBehaviour
 
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private GameObject gamePanel;
+    [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject endPanel;
     [SerializeField] private StroopTimer stroopTimer;
     [SerializeField] private GameVideoManager gameVideoManager; 
+    [SerializeField] private GameObject newRecordText;
 
     [SerializeField] private GameObject buttons;
     [SerializeField] private GameObject timerBar;
@@ -21,8 +23,12 @@ public class StroopManager : MonoBehaviour
     [SerializeField] private Animator[] buttonAnimators;
 
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text finalScoreText;
+
+    [SerializeField] StroopGameOverSFX stroopGameOverSFX;
 
     private bool gameStarted;
+    private bool gameEnded;
     private int score = 0;
 
 
@@ -46,6 +52,8 @@ public class StroopManager : MonoBehaviour
             return;
         
         gameStarted = true;
+        int totalPlayed = PlayerPrefs.GetInt("StroopTotalPlayed", 0) + 1;
+        PlayerPrefs.SetInt("StroopTotalPlayed", totalPlayed);
 
         buttons.SetActive(true);
         timerBar.SetActive(true);
@@ -107,9 +115,24 @@ public class StroopManager : MonoBehaviour
 
     private void EndGame()
     {
+        if (gameEnded)
+            return;
+
+        gameEnded = true;
+        stroopGameOverSFX.PlayGameOverSFX();
         Time.timeScale = 0f;
 
-        gamePanel.SetActive(false);
+        finalScoreText.text = score.ToString();
+        if (score > PlayerPrefs.GetInt("StroopHighestScore", 0))
+            newRecordText.SetActive(true);
+        SaveStatistics();
+
+        Debug.Log("---------------------");
+        Debug.Log("Total Played: " + PlayerPrefs.GetInt("StroopTotalPlayed",0));
+        Debug.Log("Total Score: " + PlayerPrefs.GetInt("StroopTotalScore",0));
+        Debug.Log("Highest Score: " + PlayerPrefs.GetInt("StroopHighestScore",0));
+
+        pausePanel.SetActive(true);
         endPanel.SetActive(true);
     }
 
@@ -122,7 +145,23 @@ public class StroopManager : MonoBehaviour
 
     public void ExitGame()
     {
+        Time.timeScale = 1f;
         PlayerPrefs.SetInt("ShowTutorial",  PlayerPrefs.GetInt("OriginalShowTutorial", 0));
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 4);
+    }
+
+    private void SaveStatistics()
+    {
+        int totalScore = PlayerPrefs.GetInt("StroopTotalScore", 0);
+        int highestScore = PlayerPrefs.GetInt("StroopHighestScore", 0);
+
+        totalScore += score;
+
+        if (score > highestScore)
+            PlayerPrefs.SetInt("StroopHighestScore", score);
+
+        PlayerPrefs.SetInt("StroopTotalScore", totalScore);
+
+        PlayerPrefs.Save();   
     }
 }

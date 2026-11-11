@@ -49,7 +49,7 @@ public class FirstRoundManager : MonoBehaviour
 
     private void Update()
     {
-        if (!gameStarted) return;
+        if (Time.timeScale == 0f || !gameStarted) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame && greenColor.gameObject.activeSelf)
         {
@@ -253,7 +253,6 @@ public class FirstRoundManager : MonoBehaviour
         SavePlayedGames();
 
         Time.timeScale = 0f;
-        gamePanel.SetActive(false);
         endPanel.SetActive(true);  
         pauseBackgroundPanel.SetActive(true);
         failedScreen.SetActive(failedGame);

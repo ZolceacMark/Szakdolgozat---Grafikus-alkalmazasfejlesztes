@@ -8,6 +8,7 @@ public class PauseManager : MonoBehaviour
     [SerializeField] private GameObject pauseBackground;
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject gamePanel;
+    [SerializeField] private GameObject endPanel;
     [SerializeField] private GameObject backButton;
     [SerializeField] private GameObject inGameBackButton;
     [SerializeField] private GameObject inGameRestartButton;
@@ -17,6 +18,10 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
+        if (endPanel.activeSelf)
+        {
+            return;
+        }
         if (Keyboard.current.escapeKey.wasPressedThisFrame && optionsPanel.activeSelf) 
         {
             Resume();

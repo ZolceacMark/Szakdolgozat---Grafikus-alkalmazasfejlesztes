@@ -40,7 +40,7 @@ public class MemoryManagerHard : MonoBehaviour
 
     private void Update()
     {
-        if (!enableInput) 
+        if (Time.timeScale == 0f || !enableInput) 
             return;
 
         if (Keyboard.current.gKey.wasPressedThisFrame)

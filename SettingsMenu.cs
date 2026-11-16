@@ -1,19 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class SettingsMenu : MonoBehaviour
 {
-    //public AudioMixer audioMixer;
-    //[SerializeField] private Slider volumeSlider;
     public TMPro.TMP_Dropdown resolutionDropdown;
     Resolution[] resolutions; 
     List<Resolution> filteredResolutions = new List<Resolution>();
     float currentRefreshRate;
     int currentResolutionIndex = 0;
-    [SerializeField] private UnityEngine.UI.Toggle fullScreen;
+    [SerializeField] private Toggle fullScreen;
+
+    FullScreenMode GetToggle(){
+            if (PlayerPrefs.GetInt("FullScreen", 1) == 1)
+            {
+                return FullScreenMode.FullScreenWindow;
+                //fullScreen.isOn = true;
+            }
+            else
+            {
+                return FullScreenMode.Windowed;
+                //fullScreen.isOn = false;
+            }
+        }
 
     void Start()
     {
@@ -23,15 +32,8 @@ public class SettingsMenu : MonoBehaviour
 
         currentRefreshRate = (float)Screen.currentResolution.refreshRateRatio.value;
 
-        if (PlayerPrefs.GetInt("FullScreen", 1) == 1)
-        {
-            fullScreen.isOn = true;
-        }
-        else
-        {
-            fullScreen.isOn = false;
-        }
-        
+        fullScreen.isOn = PlayerPrefs.GetInt("FullScreen", 1) == 1;
+
         List<string> options = new List<string>();
 
         for (int i = 0; i < resolutions.Length; i++)
@@ -44,7 +46,9 @@ public class SettingsMenu : MonoBehaviour
             
         for (int i = 0; i < filteredResolutions.Count; i++)
         {
-            string option = filteredResolutions[i].width + "x" + filteredResolutions[i].height + " " + filteredResolutions[i].refreshRateRatio + "Hz";
+            string option = filteredResolutions[i].width + "x" + 
+                            filteredResolutions[i].height + " " + Mathf.Round((float)filteredResolutions[i].refreshRateRatio.value) + "Hz";
+
             options.Add(option);
 
             if (filteredResolutions[i].width == Screen.width &&
@@ -62,23 +66,19 @@ public class SettingsMenu : MonoBehaviour
     public void SetResolution (int resolutionIndex)
     {
         Resolution resolution = filteredResolutions[resolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, PlayerPrefs.GetInt("FullScreen", 0) == 1);
+        Screen.SetResolution(resolution.width, resolution.height, GetToggle(), resolution.refreshRateRatio);
+    }
+
+    public void SetFullScreen(bool isFullScreen)
+    {
+        PlayerPrefs.SetInt("FullScreen", isFullScreen ? 1 : 0);
+        PlayerPrefs.Save();
+        Screen.fullScreenMode = GetToggle();
     }
 
     public void SetVolume (float mainVolume)
         {
-            //audioMixer.SetFloat("mainVolume", mainVolume);
             PlayerPrefs.SetFloat("mainVolume", mainVolume);
-            PlayerPrefs.Save();
-            Debug.Log(mainVolume);  
+            PlayerPrefs.Save(); 
         }
-
-    public void SetFullScreen(bool isFullScreen)
-    {
-        Screen.fullScreen = isFullScreen;
-        Debug.Log("FS Toggle");
-        PlayerPrefs.SetInt("FullScreen", isFullScreen ? 1 : 0);
-        PlayerPrefs.Save();
-    }
-
 }

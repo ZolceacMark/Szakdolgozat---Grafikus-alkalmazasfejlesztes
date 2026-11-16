@@ -92,6 +92,8 @@ public class MemoryManagerEasy : MonoBehaviour
         if (!enableInput)
             return;
 
+        StartCoroutine(ClickGlow(colorIndex));
+
         if (colorIndex == colors[currentInputIndex])
         {
             currentInputIndex++; 
@@ -123,6 +125,13 @@ public class MemoryManagerEasy : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator ClickGlow(int colorIndex)
+    {
+        colorGlows[colorIndex].SetActive(true);
+        yield return new WaitForSeconds(0.15f);
+        colorGlows[colorIndex].SetActive(false);
+    }        
 
     private IEnumerator NextRound()
     {

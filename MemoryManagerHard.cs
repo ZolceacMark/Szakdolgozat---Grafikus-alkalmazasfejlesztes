@@ -102,6 +102,17 @@ public class MemoryManagerHard : MonoBehaviour
     private void RandomColor()
     {
         int randomColor = Random.Range(0, colorButtons.Length);
+
+        if (colors.Count >= 2 && colors[colors.Count - 1] == colors[colors.Count - 2])
+            {
+                int blockedColor = colors[colors.Count - 1];
+
+                while (randomColor == blockedColor)
+                {
+                    randomColor = Random.Range(0, colorButtons.Length);
+                }
+            }
+
         InputType randomInput = (InputType) Random.Range(0, 2);
         colors.Add(randomColor);
         inputTypes.Add(randomInput);
@@ -148,11 +159,20 @@ public class MemoryManagerHard : MonoBehaviour
 
         SubmitInput(colorIndex, InputType.Click);
     }
+    
+    private IEnumerator ClickGlow(int colorIndex)
+    {
+        colorGlows[colorIndex].SetActive(true);
+        yield return new WaitForSeconds(0.15f);
+        colorGlows[colorIndex].SetActive(false);
+    }   
 
     private void SubmitInput(int colorIndex, InputType input)
     {
         if (!enableInput)
             return;
+
+        StartCoroutine(ClickGlow(colorIndex));
 
         if (input == InputType.Click)
         {

@@ -5,6 +5,7 @@ public class StroopButtonRandomizer : MonoBehaviour
 {
     [SerializeField] private TMP_Text[] buttonsText;
     [SerializeField] private TMP_Text tvColor;
+    private Color pinkColor = new Color32(255, 0, 131, 255); // #FF0083
     
     public enum StroopColor
     {
@@ -45,7 +46,7 @@ public class StroopButtonRandomizer : MonoBehaviour
                 tvColor.color = Color.purple;
                 break;
             case StroopColor.Pink:
-                tvColor.color = Color.pink;
+                tvColor.color = pinkColor;
                 break;
             case StroopColor.Red:
                 tvColor.color = Color.red;
@@ -119,7 +120,7 @@ public class StroopButtonRandomizer : MonoBehaviour
                     buttonText.color = Color.purple;
                     break;
                 case StroopColor.Pink:
-                    buttonText.color = Color.pink;
+                    buttonText.color = pinkColor;
                     break;
                 case StroopColor.Red:
                     buttonText.color = Color.red;
